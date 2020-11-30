@@ -46,7 +46,7 @@ stages:
     - job: Deploy
       displayName: Deploy
       pool:
-        vmImage: 'ubuntu:latest'
+        vmImage: 'ubuntu-latest'
       steps:
       - task: DownloadPipelineArtifact@2
         inputs:
