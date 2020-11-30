@@ -2,7 +2,7 @@ trigger:
 - master
 
 resources:
-  - repo: self
+- repo: self
 
 variables:
   tag: 6 
