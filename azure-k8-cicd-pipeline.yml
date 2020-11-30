@@ -1,0 +1,57 @@
+trigger:
+- master
+
+resources:
+  - repo: self
+
+variables:
+  tag: '$(Build.BuildId)'
+
+stages:
+#stage 1
+#build docker image
+#publish the k8s file
+- stage: Build
+  displayName: Build Image
+  jobs:
+    - job: Build
+      displayName: Build
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+      - task: Docker@2
+        inputs:
+          containerRegistry: 'dockerhubConn1'
+          repository: 'prashantsharma18/currency-exchange'
+          command: 'buildAndPush'
+          Dockerfile: '**/Dockerfile'
+          tags: '$(tag)'
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'manifests'
+          publishLocation: 'Container'
+
+#Stage 2
+#get K8S configuration file
+#able to deploy to k8s cluster
+- stage: Deploy
+  jobs:
+    - job: Deploy
+      displayName: Deploy
+      pool:
+        vmImage: 'ubuntu:latest'
+      steps:
+      - task: DownloadPipelineArtifact@2
+        inputs:
+          buildType: 'current'
+          artifactName: 'manifests'
+          itemPattern: '**/*.yaml'
+          targetPath: '$(System.ArtifactsDirectory)'
+      - task: KubernetesManifest@0
+        inputs:
+          action: deploy
+          kubernetesServiceConnection: 'azure-k8-connection'
+          namespace: 'default'
+          manifests: '$(System.ArtifactsDirectory)/deployment.yaml'
+          containers: 'prashantsharma18/currency-exchange:${tag}'
