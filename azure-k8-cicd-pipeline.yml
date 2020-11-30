@@ -5,7 +5,8 @@ resources:
   - repo: self
 
 variables:
-  tag: '$(Build.BuildId)'
+  tag: 6 
+#'$(Build.BuildId)'
 
 stages:
 #stage 1
@@ -19,13 +20,13 @@ stages:
       pool:
         vmImage: 'ubuntu-latest'
       steps:
-      - task: Docker@2
-        inputs:
-          containerRegistry: 'dockerhubConn1'
-          repository: 'prashantsharma18/currency-exchange'
-          command: 'buildAndPush'
-          Dockerfile: '**/Dockerfile'
-          tags: '$(tag)'
+      # - task: Docker@2
+      #   inputs:
+      #     containerRegistry: 'dockerhubConn1'
+      #     repository: 'prashantsharma18/currency-exchange'
+      #     command: 'buildAndPush'
+      #     Dockerfile: '**/Dockerfile'
+      #     tags: '$(tag)'
       - task: PublishBuildArtifacts@1
         inputs:
           PathtoPublish: '$(Build.ArtifactStagingDirectory)'
